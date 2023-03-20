@@ -1,12 +1,20 @@
-# About this
-This is a simple API for tasks management using Python's Flask framework for exercise purposes.
+## Tasks API in Python's Flask
+A simple API using Python's Flask. It has some basic functions, like:
 
-With it you can
-- Register users
-- Authenticate users
-- Perform CRUD operations on Tasks
+- User registration and authentication using JWT
+- Perform CRUD operations of Tasks
+- Some basics business rules enforced
 
-## Installation
+My main goal is to showcase some of Symfony's features like:
+
+- Migrations and model relationship
+- Authentication configuration
+- Routes definitions
+- SOLID and KISS principles on a MVC architecture
+
+The main tech behind it is Python's Flask framework, to showcase it's cleanliness and simplicity while maintaning a robust architecture. I'm also using some others libraries. For storaging, i'm using MySQL relational database
+
+## Installation and Configuration
 Having Python 3.7 or greater installed on your machine, run the following commands:
 
 ```
