@@ -20,7 +20,7 @@ Having Python 3.7 or greater installed on your machine, run the following comman
 ```
 py -3 -m venv venv
 source venv/Scripts/activate
-py -m install -r requirements.txt
+pip install -r requirements.txt
 ```
 If no error is thrown, the basic environment is installed. Now you must generate the database and table, but before that you must have MySQL Server running and receiving connections. Once you make sure of that, run the following:
 ```
