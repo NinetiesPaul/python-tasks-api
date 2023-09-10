@@ -8,7 +8,7 @@ from routes import users
 
 from models.tasks import Tasks, task_schema, tasks_schema
 
-@app.post("/task")
+@app.post("/api/task/create")
 @users.token_required
 def post_task(current_user):
     data = request.get_json()
@@ -25,14 +25,14 @@ def post_task(current_user):
     elif data['type'] not in Tasks.allowedTypes():
         return make_response(jsonify({ "msg": "Invalid type given", "success": False }), 400)
 
-    task = Tasks(data['title'], data['description'], current_user.id, data['type'])
+    task = Tasks(data['title'], data['description'], data['type'], current_user.id)
     mysql.session.add(task)
     mysql.session.commit()
 
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
-@app.get("/tasks")
+@app.get("/api/task/list")
 @users.token_required
 def get_tasks(current_user):
     args = request.args
@@ -58,7 +58,18 @@ def get_tasks(current_user):
     result = tasks_schema.dump(tasks)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
-@app.put("/task/<id>")
+@app.get("/api/task/view/<id>")
+@users.token_required
+def get_task(current_user, id):
+    task = Tasks.query.filter(Tasks.id == id).all()
+
+    if not task:
+        return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+
+    result = tasks_schema.dump(task)
+    return make_response(jsonify({ "data": result, "success": True }), 200)
+
+@app.put("/api/task/update/<id>")
 @users.token_required
 def put_task(current_user, id):
     data = request.get_json()
@@ -67,7 +78,13 @@ def put_task(current_user, id):
 
     if not task:
         return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+
+    if task.status == 'closed':
+        return make_response(jsonify({ "msg": "Invalid operation: cannot update a closed task", "success": False }), 404)
     
+    if 'status' in data and data['status'] == 'closed':
+        return make_response(jsonify({ "msg": "Invalid operation: use PUT /api/task/close/{id} to close a task", "success": False }), 400)
+
     if 'title' in data:
         task.title = data['title']
     
@@ -76,21 +93,19 @@ def put_task(current_user, id):
 
     if 'type' in data:
         if data['type'] not in Tasks.allowedTypes():
-            return make_response(jsonify({ "msg": "Invalid type given", "success": False }), 400)
+            return make_response(jsonify({ "msg": "Invalid task type: must be one of 'feature' 'bugfix' 'hotfix'", "success": False }), 400)
         task.type = data['type']
 
     if 'status' in data:
         if data['status'] not in Tasks.allowedStatuses():
-            return make_response(jsonify({ "msg": "Invalid status given", "success": False }), 400)
-        if data['status'] == 'closed':
-            return make_response(jsonify({ "msg": "please use the appropriate URL: PUT /task/{id}/closed", "success": False }), 400)
+            return make_response(jsonify({ "msg": "Invalid task status: must be one of 'open' 'closed' 'in_dev' 'blocked' 'in_qa'", "success": False }), 400)
         task.status = data['status']
 
     mysql.session.commit()
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
-@app.put("/task/<id>/close")
+@app.put("/api/task/close/<id>")
 @users.token_required
 def close_task(current_user, id):
     task = Tasks.query.get(id)
@@ -98,15 +113,18 @@ def close_task(current_user, id):
     if not task:
         return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
     
-    if task.status != 'closed':
-        task.status = 'closed'
-        task.closed_on = datetime.datetime.now()
+    if task.status == 'closed':
+        return make_response(jsonify({ "msg": "Invalid operation: cannot close a closed task", "success": False }), 404)
+    
+    task.status = 'closed'
+    task.closed_on = datetime.datetime.now()
+    task.closed_by = current_user.id
 
     mysql.session.commit()
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
-@app.delete("/task/<id>")
+@app.delete("/api/task/close/<id>")
 @users.token_required
 def delete_task(current_user, id):
     task = Tasks.query.get(id)
