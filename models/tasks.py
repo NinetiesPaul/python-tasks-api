@@ -8,18 +8,20 @@ class Tasks(mysql.Model):
     description = mysql.Column(mysql.String(255), nullable=False)
     type = mysql.Column(mysql.String(255), nullable=False)
     status = mysql.Column(mysql.String(255), nullable=False)
-    owner = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
-    created_on = mysql.Column(mysql.DateTime)
+    created_on = mysql.Column(mysql.DateTime, nullable=False)
+    created_by = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
     closed_on = mysql.Column(mysql.DateTime, nullable=True)
+    closed_by = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=True)
 
-    def __init__(self, title, description, owner, type, created_on = datetime.datetime.now(), closed_on = None, status = "open"):
+    def __init__(self, title, description, type, created_by, created_on = datetime.datetime.now(), closed_on = None, closed_by = None, status = "open"):
         self.title = title
         self.description = description
         self.type = type
         self.status = status
-        self.owner = owner
         self.created_on = created_on
+        self.created_by = created_by
         self.closed_on = closed_on
+        self.closed_by = closed_by
     
     def allowedTypes():
         return [ 'feature', 'bugfix', 'hotfix' ]
@@ -29,7 +31,7 @@ class Tasks(mysql.Model):
 
 class TasksSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'title', 'description', 'type', 'status', 'owner', 'closed_on', 'created_on')
+        fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by')
 
 task_schema = TasksSchema()
 tasks_schema = TasksSchema(many=True)
