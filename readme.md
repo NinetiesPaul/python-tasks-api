@@ -48,8 +48,8 @@ flask run
 And you're ready to use the API!
 
 ## Usage
-Before managing Tasks, you must register some users:
-#### __User registration__
+### __Users__
+#### User creation
 ```
 curl --location 'http://localhost:5000/register' \
 --header 'Content-Type: application/json' \
@@ -58,7 +58,7 @@ curl --location 'http://localhost:5000/register' \
     "password": "123456"
 }'
 ```
-#### __User authentication__
+#### User authentication
 ```
 curl --location 'http://localhost:5000/login' \
 --header 'Content-Type: application/json' \
@@ -67,11 +67,12 @@ curl --location 'http://localhost:5000/login' \
     "password": "123456"
 }'
 ```
-That endpoint will log on and authenticate the user, and retrieve an authorization token to be used on all the tasks related requests. Copy it and place it on all ```{token}``` keyword on the following requests
-#### __Task creation__
-- Allowed types are: feature, bugfix, hotfix
+### __Tasks__
+
+The User Authetication endpoint will authenticate the user, and retrieve an authorization token to be used on all the tasks related requests. Copy it and place it on all ```{token}``` keyword on the following requests
+#### Creating a new Task
 ```
-curl --location 'http://localhost:5000/task' \
+curl --location 'http://localhost:5000/api/task/create' \
 --header 'Authorization: Bearer {token}' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -81,19 +82,15 @@ curl --location 'http://localhost:5000/task' \
 }'
 ```
 
-#### __Task selection__
-- You can use ```type``` and ```status``` as query parameters for filtering. If no parameters is passed, all tasks are retrieved
+#### Listing all Tasks
 ```
-curl --location 'http://localhost:5000/tasks' \
+curl --location 'http://localhost:5000/api/task/list' \
 --header 'Authorization: Bearer {token}'
 ```
 
-#### __Task update__
-- Replace ```{token_id}``` with a Token Id
-- You can not close a task on this request. Use the ```PUT /close``` endpoint
-- Allowed statuses are: open, closed, in_dev, blocked, in_qa
+#### Updating a Task
 ```
-curl --location --request PUT 'http://localhost:5000/task/{token_id}' \
+curl --location --request PUT 'http://localhost:5000/api/task/update/{taskId}' \
 --header 'Authorization: Bearer {token}' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -103,16 +100,14 @@ curl --location --request PUT 'http://localhost:5000/task/{token_id}' \
 }'
 ```
 
-#### __Task deletion__
-- Replace ```{token_id}``` with a Token Id
+#### Deleting a Task
 ```
-curl --location --request DELETE 'http://localhost:5000/task/{token_id}' \
+curl --location --request DELETE 'http://localhost:5000/api/task/delete/{taskId}' \
 --header 'Authorization: Bearer {token}'
 ```
 
-#### __Task closing__
-- Replace ```{token_id}``` with a Token Id
+#### Closing a Task
 ```
-curl --location --request PUT 'http://localhost:5000/task/{token_id}/close' \
+curl --location --request PUT 'http://localhost:5000/api/task/close/{taskId}' \
 --header 'Authorization: Bearer {token}'
 ```
