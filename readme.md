@@ -14,8 +14,14 @@ My main goal is to showcase some of Symfony's features like:
 
 The main tech behind it is Python's Flask framework, to showcase it's cleanliness and simplicity while maintaning a robust architecture. I'm also using some others libraries. For storaging, i'm using MySQL relational database
 
+## Environment setup
+To run this application you must have installed on your environment:
+
+* `Python` - For the main application 
+* `MySQL` - For storaging and accessing data
+
 ## Installation and Configuration
-Having Python 3.7 or greater installed on your machine, run the following commands:
+Once all required software is up and running, execute the following commands:
 
 ```
 py -3 -m venv venv
