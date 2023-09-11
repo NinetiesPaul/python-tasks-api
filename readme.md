@@ -5,7 +5,7 @@ A simple API using Python's Flask. It has some basic functions, like:
 - Perform CRUD operations of Tasks
 - Some basics business rules enforced
 
-My main goal is to showcase some of Symfony's features like:
+My main goal is to showcase some concepts, such as:
 
 - Migrations and model relationship
 - Authentication configuration
