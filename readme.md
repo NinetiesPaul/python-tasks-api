@@ -25,7 +25,11 @@ Once all required software is up and running, execute the following commands:
 
 ```
 py -3 -m venv venv
+```
+```
 source venv/Scripts/activate
+```
+```
 pip install -r requirements.txt
 ```
 If no error is thrown, the basic environment is installed. Now you must generate the database and table, but before that you must have MySQL Server running and receiving connections. Once you make sure of that, run the following:
@@ -36,9 +40,17 @@ Open the newly created .env file and on the ```DB_URL``` parameter replace the k
 then go back to the prompt and run the following:
 ```
 flask shell
+```
+```
 from app import mysql
+```
+```
 from models import tasks, users
+```
+```
 mysql.create_all()
+```
+```
 exit()
 ```
 If there's no big red error messages screaming at you, then you are good to go. All you have to do now is run:
