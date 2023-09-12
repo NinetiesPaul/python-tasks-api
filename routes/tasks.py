@@ -7,6 +7,7 @@ from app import app, mysql
 from routes import users
 
 from models.tasks import Tasks, task_schema, tasks_schema
+from models.users import Users, user_schema, users_schema
 
 @app.post("/api/task/create")
 @users.token_required
@@ -23,7 +24,7 @@ def post_task(current_user):
         return make_response(jsonify({ "msg": "missing required parameter: type", "success": False }), 400)
     
     elif data['type'] not in Tasks.allowedTypes():
-        return make_response(jsonify({ "msg": "Invalid type given", "success": False }), 400)
+        return make_response(jsonify({ "msg": "Invalid task type: must be one of 'feature' 'bugfix' 'hotfix'", "success": False }), 400)
 
     task = Tasks(data['title'], data['description'], data['type'], current_user.id)
     mysql.session.add(task)
@@ -45,13 +46,19 @@ def get_tasks(current_user):
 
         if 'type' in args:
             if args['type'] not in Tasks.allowedTypes():
-                return make_response(jsonify({ "msg": "Invalid type given", "success": False }), 400)
+                return make_response(jsonify({ "msg": "Invalid task type: must be one of 'feature' 'bugfix' 'hotfix'", "success": False }), 400)
             tasks = tasks.filter(Tasks.type == args['type'])
 
         if 'status' in args:
             if args['status'] not in Tasks.allowedStatuses():
-                return make_response(jsonify({ "msg": "Invalid status given", "success": False }), 400)
+                return make_response(jsonify({ "msg": "Invalid task status: must be one of 'open' 'closed' 'in_dev' 'blocked' 'in_qa'", "success": False }), 400)
             tasks = tasks.filter(Tasks.status == args['status'])
+
+        if 'created_by' in args:
+            user = Users.query.get(args['created_by'])
+            if not user:
+                return make_response(jsonify({ "msg": "No user found with given id", "success": False }), 404)
+            tasks = tasks.filter(Tasks.created_by == args['created_by'])
 
         tasks = tasks.all()
 
@@ -61,12 +68,12 @@ def get_tasks(current_user):
 @app.get("/api/task/view/<id>")
 @users.token_required
 def get_task(current_user, id):
-    task = Tasks.query.filter(Tasks.id == id).all()
+    task = Tasks.query.get(id)
 
     if not task:
         return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
 
-    result = tasks_schema.dump(task)
+    result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.put("/api/task/update/<id>")
