@@ -80,7 +80,6 @@ curl --location 'http://localhost:5000/login' \
 }'
 ```
 ### __Tasks__
-
 The User Authetication endpoint will authenticate the user, and retrieve an authorization token to be used on all the tasks related requests. Copy it and place it on all ```{token}``` keyword on the following requests
 #### Creating a new Task
 ```
@@ -94,21 +93,28 @@ curl --location 'http://localhost:5000/api/task/create' \
 }'
 ```
 
-#### Listing all Tasks
+#### Selecting a single Task
 ```
-curl --location 'http://localhost:5000/api/task/list' \
+curl --location 'http://localhost:5000/api/task/view/{taskId}' \
+--header 'Authorization: Bearer {token}'
+```
+
+#### Listing all Tasks
+Replace ```{created_by}``` with a User Id  
+Replace ```{status}``` with any of the following: new, in_dev, blocked, closed  
+Replace ```{type}``` with any of the following: new_feature, bugfix, hotfix  
+```
+curl --location 'http://localhost:5000/api/task/list?type={type}&status={status}' \
 --header 'Authorization: Bearer {token}'
 ```
 
 #### Updating a Task
 ```
 curl --location --request PUT 'http://localhost:5000/api/task/update/{taskId}' \
---header 'Authorization: Bearer {token}' \
 --header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {token}' \
 --data '{
-    "title": "a new title",
-    "type": "bugfix",
-    "status": "closed"
+    "status": "in_qa"
 }'
 ```
 
