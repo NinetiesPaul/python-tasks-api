@@ -1,5 +1,6 @@
 import jwt
 import datetime
+import re
 from flask import make_response, request, jsonify
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -10,6 +11,14 @@ from models.users import Users, user_schema
 
 @app.post("/register")
 def register():
+    user = Users.query.filter_by(username = request.json['username']).first()
+    if user:
+        return make_response(jsonify({ "msg": "E-mail already taken", "success": False }), 404)
+    
+    if not re.search("^(.+)@(\\S+)$", request.json['username']):
+        return make_response(jsonify({ "msg": "E-mail is invalid", "success": False }), 404)
+
+
     password = generate_password_hash(request.json['password'])
 
     user = Users(request.json['username'], password)
