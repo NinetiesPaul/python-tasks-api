@@ -101,8 +101,8 @@ curl --location 'http://localhost:5000/api/task/view/{taskId}' \
 
 #### Listing all Tasks
 Replace ```{created_by}``` with a User Id  
-Replace ```{status}``` with any of the following: new, in_dev, blocked, closed  
-Replace ```{type}``` with any of the following: new_feature, bugfix, hotfix  
+Replace ```{status}``` with any of the following: new, in_qa, in_dev, blocked, closed  
+Replace ```{type}``` with any of the following: feature, bugfix, hotfix  
 ```
 curl --location 'http://localhost:5000/api/task/list?type={type}&status={status}' \
 --header 'Authorization: Bearer {token}'
