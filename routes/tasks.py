@@ -26,7 +26,7 @@ def post_task(current_user):
     elif data['type'] not in Tasks.allowedTypes():
         return make_response(jsonify({ "msg": "Invalid task type: must be one of 'feature' 'bugfix' 'hotfix'", "success": False }), 400)
 
-    task = Tasks(data['title'], data['description'], data['type'], current_user.id)
+    task = Tasks(data['title'], data['description'], data['type'], current_user)
     mysql.session.add(task)
     mysql.session.commit()
 
@@ -58,7 +58,7 @@ def get_tasks(current_user):
             user = Users.query.get(args['created_by'])
             if not user:
                 return make_response(jsonify({ "msg": "No user found with given id", "success": False }), 404)
-            tasks = tasks.filter(Tasks.created_by == args['created_by'])
+            tasks = tasks.filter(Tasks.created_by_id == args['created_by'])
 
         tasks = tasks.all()
 
@@ -125,7 +125,7 @@ def close_task(current_user, id):
     
     task.status = 'closed'
     task.closed_on = datetime.datetime.now()
-    task.closed_by = current_user.id
+    task.closed_by = current_user
 
     mysql.session.commit()
     result = task_schema.dump(task)
