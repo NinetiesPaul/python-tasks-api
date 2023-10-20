@@ -57,12 +57,15 @@ def get_tasks(current_user):
         if 'created_by' in args:
             user = Users.query.get(args['created_by'])
             if not user:
-                return make_response(jsonify({ "msg": "No user found with given id", "success": False }), 404)
+                return make_response(jsonify({ "msg": "USER_NOT_FOUND", "success": False }), 404)
             tasks = tasks.filter(Tasks.created_by_id == args['created_by'])
 
         tasks = tasks.all()
 
-    result = tasks_schema.dump(tasks)
+    result = {}
+    result['tasks'] = tasks_schema.dump(tasks)
+    result['total'] = len(tasks)
+
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.get("/api/task/view/<id>")
@@ -71,7 +74,7 @@ def get_task(current_user, id):
     task = Tasks.query.get(id)
 
     if not task:
-        return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+        return make_response(jsonify({ "msg": "TASK_NOT_FOUND", "success": False }), 404)
 
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
@@ -84,7 +87,7 @@ def put_task(current_user, id):
     task = Tasks.query.get(id)
 
     if not task:
-        return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+        return make_response(jsonify({ "msg": "TASK_NOT_FOUND", "success": False }), 404)
 
     if task.status == 'closed':
         return make_response(jsonify({ "msg": "Invalid operation: cannot update a closed task", "success": False }), 404)
@@ -118,7 +121,7 @@ def close_task(current_user, id):
     task = Tasks.query.get(id)
 
     if not task:
-        return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+        return make_response(jsonify({ "msg": "TASK_NOT_FOUND", "success": False }), 404)
     
     if task.status == 'closed':
         return make_response(jsonify({ "msg": "Invalid operation: cannot close a closed task", "success": False }), 404)
@@ -131,15 +134,14 @@ def close_task(current_user, id):
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
-@app.delete("/api/task/close/<id>")
+@app.delete("/api/task/delete/<id>")
 @users.token_required
 def delete_task(current_user, id):
     task = Tasks.query.get(id)
 
     if not task:
-        return make_response(jsonify({ "msg": "No task found with given id", "success": False }), 404)
+        return make_response(jsonify({ "msg": "TASK_NOT_FOUND", "success": False }), 404)
     
     mysql.session.delete(task)
     mysql.session.commit()
-    result = task_schema.dump(task)
-    return make_response(jsonify({ "msg": "Task deleted", "success": True }), 200)
+    return make_response(jsonify({ "msg": "Task id '" + id + "' was deleted", "success": True }), 200)
