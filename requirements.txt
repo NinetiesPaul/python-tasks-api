@@ -6,3 +6,4 @@ mysqlclient
 python-dotenv
 Werkzeug
 PyJWT
+flask-cors
