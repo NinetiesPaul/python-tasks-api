@@ -66,7 +66,8 @@ And you're ready to use the API!
 curl --location 'http://localhost:5000/register' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "username": "t.soprano@mail.com",
+    "name": "T. Soprano",
+    "email": "t.soprano@mail.com",
     "password": "123456"
 }'
 ```
