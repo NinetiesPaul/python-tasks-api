@@ -32,8 +32,8 @@ class Tasks(mysql.Model):
         return [ 'open', 'closed', 'in_dev', 'blocked', 'in_qa' ]
 
 class TasksSchema(ma.Schema):
-    created_by = fields.Nested(user_schema, only=["id", "username"])
-    closed_by = fields.Nested(user_schema, only=["id", "username"])
+    created_by = fields.Nested(user_schema, only=["id", "email", "name"])
+    closed_by = fields.Nested(user_schema, only=["id", "email", "name"])
     class Meta:
         fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by')
 
