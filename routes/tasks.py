@@ -6,6 +6,7 @@ from app import app, mysql
 
 from routes import users
 
+from models.taskHistory import TaskHistory
 from models.tasks import Tasks, task_schema, tasks_schema
 from models.users import Users, user_schema, users_schema
 
@@ -94,24 +95,37 @@ def put_task(current_user, id):
     
     if 'status' in data and data['status'] == 'closed':
         return make_response(jsonify({ "msg": "Invalid operation: use PUT /api/task/close/{id} to close a task", "success": False }), 400)
+    
+    historyEntries = {}
 
-    if 'title' in data:
+    if 'title' in data and task.title != data['title']:
+        historyEntries['title'] = [ task.title, data['title'] ]
         task.title = data['title']
     
-    if 'description' in data:
+    if 'description' in data and task.description != data['description']:
+        historyEntries['description'] = [ task.description, data['description'] ]
         task.description = data['description']
 
-    if 'type' in data:
+    if 'type' in data and task.type != data['type']:
         if data['type'] not in Tasks.allowedTypes():
             return make_response(jsonify({ "msg": "Invalid task type: must be one of 'feature' 'bugfix' 'hotfix'", "success": False }), 400)
+        
+        historyEntries['type'] = [ task.type, data['type'] ]
         task.type = data['type']
 
-    if 'status' in data:
+    if 'status' in data and task.status != data['status']:
         if data['status'] not in Tasks.allowedStatuses():
             return make_response(jsonify({ "msg": "Invalid task status: must be one of 'open' 'closed' 'in_dev' 'blocked' 'in_qa'", "success": False }), 400)
+        historyEntries['status'] = [ task.status, data['status'] ]
         task.status = data['status']
 
     mysql.session.commit()
+
+    for entry in historyEntries:
+        taskHistory = TaskHistory(entry, historyEntries[entry][0], historyEntries[entry][1], current_user, task)
+        mysql.session.add(taskHistory)
+        mysql.session.commit()
+
     result = task_schema.dump(task)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
@@ -126,6 +140,10 @@ def close_task(current_user, id):
     if task.status == 'closed':
         return make_response(jsonify({ "msg": "Invalid operation: cannot close a closed task", "success": False }), 404)
     
+    taskHistory = TaskHistory('status', task.status, 'closed', current_user, task)
+    mysql.session.add(taskHistory)
+    mysql.session.commit()
+
     task.status = 'closed'
     task.closed_on = datetime.datetime.now()
     task.closed_by = current_user
