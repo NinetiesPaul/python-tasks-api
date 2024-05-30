@@ -9,6 +9,7 @@ class Users(mysql.Model):
 
     createdBy = mysql.relationship('Tasks', backref='created_by', lazy='joined', foreign_keys="Tasks.created_by_id")
     closedBy = mysql.relationship('Tasks', backref='closed_by', lazy='joined', foreign_keys="Tasks.closed_by_id")
+    changedBy = mysql.relationship('TaskHistory', backref='changed_by', lazy='joined', foreign_keys="TaskHistory.changed_by_id")
 
     def __init__(self, name, email, password):
         self.name = name
