@@ -37,9 +37,15 @@ class Tasks(mysql.Model):
 class TasksSchema(ma.Schema):
     created_by = fields.Nested(user_schema, only=["id", "email", "name"])
     closed_by = fields.Nested(user_schema, only=["id", "email", "name"])
+    class Meta:
+        fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by')
+
+class TaskSchema(ma.Schema):
+    created_by = fields.Nested(user_schema, only=["id", "email", "name"])
+    closed_by = fields.Nested(user_schema, only=["id", "email", "name"])
     task_history = fields.Nested(taskHistory_schema, many=True)
     class Meta:
         fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by', 'task_history')
 
-task_schema = TasksSchema()
+task_schema = TaskSchema()
 tasks_schema = TasksSchema(many=True)
