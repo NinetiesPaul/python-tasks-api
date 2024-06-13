@@ -32,6 +32,7 @@ def post_task(current_user):
     mysql.session.commit()
 
     result = task_schema.dump(task)
+    del result['task_history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.get("/api/task/list")
@@ -127,6 +128,7 @@ def put_task(current_user, id):
         mysql.session.commit()
 
     result = task_schema.dump(task)
+    del result['task_history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.put("/api/task/close/<id>")
@@ -150,6 +152,7 @@ def close_task(current_user, id):
 
     mysql.session.commit()
     result = task_schema.dump(task)
+    del result['task_history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.delete("/api/task/delete/<id>")
