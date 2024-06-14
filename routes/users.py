@@ -30,17 +30,16 @@ def register():
 
 @app.post("/login")
 def login():
-    try: 
-        user = Users.query.filter(Users.email == request.json['username']).one()
-    except:
+    user = Users.query.filter(Users.email == request.json['username']).first()
+    if not user:
         return make_response(jsonify({ "msg": "user not found", "success": False }), 404)
 
-    if check_password_hash(user.password, request.json['password']):
-        token = jwt.encode({'email': user.email, 'exp': datetime.datetime.now() + datetime.timedelta(hours=12) }, env_var['SECRET'])
-        return make_response(jsonify({ "token": token, "success": True }), 200)
+    if not check_password_hash(user.password, request.json['password']):
+        return make_response(jsonify({ "msg": "invalid credentials", "success": False }), 400)
 
-    return make_response(jsonify({ "msg": "invalid credentials", "success": False }), 400)
-
+    token = jwt.encode({'email': user.email, 'exp': datetime.datetime.now() + datetime.timedelta(hours=12) }, env_var['SECRET'])
+    return make_response(jsonify({ "token": token, "success": True }), 200)
+    
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):

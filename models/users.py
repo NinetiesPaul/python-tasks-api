@@ -18,7 +18,7 @@ class Users(mysql.Model):
 
 class UsersSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'email', 'password')
+        fields = ('id', 'name', 'email')
 
 user_schema = UsersSchema()
 users_schema = UsersSchema(many=True)
