@@ -3,15 +3,13 @@ from flask import make_response, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import app, mysql
-
-from routes import users
-
+from routes import validations
 from models.taskHistory import TaskHistory
 from models.tasks import Tasks, task_schema, tasks_schema
 from models.users import Users, user_schema, users_schema
 
 @app.post("/api/task/create")
-@users.token_required
+@validations.token_required
 def post_task(current_user):
     data = request.get_json()
 
@@ -32,16 +30,16 @@ def post_task(current_user):
     mysql.session.commit()
 
     result = task_schema.dump(task)
-    del result['task_history']
+    del result['history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.get("/api/task/list")
-@users.token_required
+@validations.token_required
 def get_tasks(current_user):
     args = request.args
 
     if not args:
-        tasks = Tasks.query.all()
+        tasks = Tasks.query.order_by(Tasks.id.desc()).all()
 
     else:
         tasks = Tasks.query
@@ -62,7 +60,7 @@ def get_tasks(current_user):
                 return make_response(jsonify({ "msg": "USER_NOT_FOUND", "success": False }), 404)
             tasks = tasks.filter(Tasks.created_by_id == args['created_by'])
 
-        tasks = tasks.all()
+        tasks = tasks.order_by(Tasks.id.desc()).all()
 
     result = {}
     result['tasks'] = tasks_schema.dump(tasks)
@@ -71,7 +69,7 @@ def get_tasks(current_user):
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.get("/api/task/view/<id>")
-@users.token_required
+@validations.token_required
 def get_task(current_user, id):
     task = Tasks.query.get(id)
 
@@ -82,7 +80,7 @@ def get_task(current_user, id):
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.put("/api/task/update/<id>")
-@users.token_required
+@validations.token_required
 def put_task(current_user, id):
     data = request.get_json()
 
@@ -128,11 +126,11 @@ def put_task(current_user, id):
         mysql.session.commit()
 
     result = task_schema.dump(task)
-    del result['task_history']
+    del result['history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.put("/api/task/close/<id>")
-@users.token_required
+@validations.token_required
 def close_task(current_user, id):
     task = Tasks.query.get(id)
 
@@ -152,11 +150,11 @@ def close_task(current_user, id):
 
     mysql.session.commit()
     result = task_schema.dump(task)
-    del result['task_history']
+    del result['history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.delete("/api/task/delete/<id>")
-@users.token_required
+@validations.token_required
 def delete_task(current_user, id):
     task = Tasks.query.get(id)
 
