@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app import app, mysql
 from routes import validations
 from models.taskHistory import TaskHistory
+from models.taskAssignee import TaskAssignees, taskAssignee_schema
 from models.tasks import Tasks, task_schema, tasks_schema
 from models.users import Users, user_schema, users_schema
 
@@ -141,6 +142,55 @@ def close_task(current_user, id):
     result = task_schema.dump(task)
     del result['history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
+
+@app.post("/api/task/assign/<taskId>")
+@validations.token_required
+def assign_task(current_user, taskId):
+    requestData = request.get_json()
+    task = Tasks.query.get(taskId)
+
+    if not task:
+        return make_response(jsonify({ "message": [ "TASK_NOT_FOUND" ], "success": False }), 404)
+    
+    assignedTo = Users.query.get(requestData['assigned_to'])
+    if not assignedTo:
+        return make_response(jsonify({ "message": [ "USER_NOT_FOUND" ], "success": False }), 404)
+
+    try:
+        taskAssignee = TaskAssignees(current_user, assignedTo, task)
+        mysql.session.add(taskAssignee)
+        mysql.session.commit()
+    except Exception as e:
+        if type(e) == mysql.exc.IntegrityError:
+            return make_response(jsonify({ "message": [ "USER_ALREADY_ASSIGNED" ], "success": False }), 202)
+    
+    taskHistory = TaskHistory("added_assignee", "", assignedTo.name, current_user, task)
+    mysql.session.add(taskHistory)
+    mysql.session.commit()
+
+    mysql.session.commit()
+    result = taskAssignee_schema.dump(taskAssignee)
+    return make_response(jsonify({ "data": result, "success": True }), 200)
+
+@app.delete("/api/task/unassign/<assignmentId>")
+@validations.token_required
+def unassign_task(current_user, assignmentId):
+    assignment = TaskAssignees.query.get(assignmentId)
+
+    if not assignment:
+        return make_response(jsonify({ "message": [ "ASSIGNMENT_NOT_FOUND" ], "success": False }), 404)
+    
+    mysql.session.delete(assignment)
+    mysql.session.commit()
+
+    assignedTo = Users.query.get(assignment.assigned_to_id)
+    task = Tasks.query.get(assignment.task_id)
+
+    taskHistory = TaskHistory("removed_assignee", "", assignedTo.name, current_user, task)
+    mysql.session.add(taskHistory)
+    mysql.session.commit()
+
+    return make_response(jsonify({ "data": None, "success": True }), 200)
 
 @app.delete("/api/task/delete/<id>")
 @validations.token_required
