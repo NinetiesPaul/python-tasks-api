@@ -52,6 +52,12 @@ def get_tasks(current_user):
             else:
                 tasks = tasks.filter(Tasks.created_by_id == args['created_by'])
 
+        if 'assigned' in args:
+            if args['assigned'] == "false":
+                tasks = tasks.filter(Tasks.assignees == None)
+            else:
+                tasks = tasks.filter(Tasks.assignees.any(id != None))
+
         if len(errorMessages) > 0:
             return make_response(jsonify({ "message": errorMessages, "success": False }), 400)
 
