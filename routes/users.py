@@ -6,7 +6,7 @@ from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import app, mysql, env_var
-from models.users import Users, user_schema
+from models.users import Users, user_schema, users_schema
 from routes import validations
 
 @app.post("/register")
@@ -40,4 +40,13 @@ def login():
 
     token = jwt.encode({'email': user.email, 'exp': datetime.datetime.now() + datetime.timedelta(hours=12) }, env_var['SECRET'])
     return make_response(jsonify({ "token": token, "success": True }), 200)
-    
+
+@app.get("/api/users/list")
+def listUsers():
+    users = Users.query.order_by(Users.id.desc()).all()
+
+    result = {}
+    result['users'] = users_schema.dump(users)
+    result['total'] = len(users)
+
+    return make_response(jsonify({ "data": result, "success": True }), 200)
