@@ -17,8 +17,8 @@ class Tasks(mysql.Model):
     closed_on = mysql.Column(mysql.DateTime, nullable=True)
     closed_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=True)
 
-    history = mysql.relationship('TaskHistory', backref='task', lazy='joined', foreign_keys="TaskHistory.task_id")
-    assignees = mysql.relationship('TaskAssignees', backref='task', lazy='joined', foreign_keys="TaskAssignees.task_id")
+    history = mysql.relationship('TaskHistory', backref='task', lazy='select', foreign_keys="TaskHistory.task_id")
+    assignees = mysql.relationship('TaskAssignees', backref='task', lazy='select', foreign_keys="TaskAssignees.task_id")
 
     def __init__(self, title, description, type, created_by, created_on = datetime.datetime.now(), closed_on = None, closed_by = None, status = "open"):
         self.title = title
