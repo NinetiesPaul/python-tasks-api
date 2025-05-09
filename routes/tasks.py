@@ -6,6 +6,7 @@ from app import app, mysql
 from routes import validations
 from models.taskHistory import TaskHistory
 from models.taskAssignee import TaskAssignees, taskAssignee_schema
+from models.taskComment import TaskComment, taskComment_schema
 from models.tasks import Tasks, task_schema, tasks_schema
 from models.users import Users, user_schema, users_schema
 
@@ -151,6 +152,7 @@ def close_task(current_user, id):
 
 @app.post("/api/task/assign/<taskId>")
 @validations.token_required
+@validations.validator
 def assign_task(current_user, taskId):
     requestData = request.get_json()
     task = Tasks.query.get(taskId)
@@ -194,6 +196,36 @@ def unassign_task(current_user, assignmentId):
 
     taskHistory = TaskHistory("removed_assignee", "", assignedTo.name, current_user, task)
     mysql.session.add(taskHistory)
+    mysql.session.commit()
+
+    return make_response(jsonify({ "data": None, "success": True }), 200)
+
+@app.post("/api/task/comment/<commentId>")
+@validations.token_required
+@validations.validator
+def add_comment(current_user, commentId):
+    requestData = request.get_json()
+    task = Tasks.query.get(commentId)
+
+    if not task:
+        return make_response(jsonify({ "message": [ "TASK_NOT_FOUND" ], "success": False }), 404)
+
+    taskComment = TaskComment(requestData['text'], current_user, task)
+    mysql.session.add(taskComment)
+    mysql.session.commit()
+
+    result = taskComment_schema.dump(taskComment)
+    return make_response(jsonify({ "data": result, "success": True }), 200)
+
+@app.delete("/api/task/comment/<commentId>")
+@validations.token_required
+def delete_comment(current_user, commentId):
+    comment = TaskComment.query.get(commentId)
+
+    if not comment:
+        return make_response(jsonify({ "message": [ "COMMENT_NOT_FOUND" ], "success": False }), 404)
+    
+    mysql.session.delete(comment)
     mysql.session.commit()
 
     return make_response(jsonify({ "data": None, "success": True }), 200)
