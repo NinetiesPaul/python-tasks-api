@@ -12,6 +12,7 @@ class Users(mysql.Model):
     changedBy = mysql.relationship('TaskHistory', backref='changed_by', lazy='select', foreign_keys="TaskHistory.changed_by_id")
     assignedTo = mysql.relationship('TaskAssignees', backref='assigned_to', lazy='select', foreign_keys="TaskAssignees.assigned_to_id")
     assignedBy = mysql.relationship('TaskAssignees', backref='assigned_by', lazy='select', foreign_keys="TaskAssignees.assigned_by_id")
+    commentCreatedBy = mysql.relationship('TaskComment', backref='created_by', lazy='select', foreign_keys="TaskComment.created_by_id")
 
     def __init__(self, name, email, password):
         self.name = name

@@ -3,6 +3,7 @@ import datetime
 from app import mysql, ma
 from models.users import user_schema
 from models.taskHistory import taskHistory_schema
+from models.taskComment import taskComment_schema
 from models.taskAssignee import taskAssignees_schema
 from marshmallow import fields
 
@@ -17,6 +18,7 @@ class Tasks(mysql.Model):
     closed_on = mysql.Column(mysql.DateTime, nullable=True)
     closed_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=True)
 
+    comments = mysql.relationship('TaskComment', backref='task', lazy='select', foreign_keys="TaskComment.task_id")
     history = mysql.relationship('TaskHistory', backref='task', lazy='select', foreign_keys="TaskHistory.task_id")
     assignees = mysql.relationship('TaskAssignees', backref='task', lazy='select', foreign_keys="TaskAssignees.task_id")
 
@@ -46,10 +48,11 @@ class TasksSchema(ma.Schema):
 class TaskSchema(ma.Schema):
     created_by = fields.Nested(user_schema, only=["id", "email", "name"])
     closed_by = fields.Nested(user_schema, only=["id", "email", "name"])
+    comments = fields.Nested(taskComment_schema, many=True)
     history = fields.Nested(taskHistory_schema, many=True)
     assignees = fields.Nested(taskAssignees_schema, many=True)
     class Meta:
-        fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by', 'history', 'assignees')
+        fields = ('id', 'title', 'description', 'type', 'status', 'created_on', 'created_by', 'closed_on', 'closed_by', 'comments', 'history', 'assignees')
 
 task_schema = TaskSchema()
 tasks_schema = TasksSchema(many=True)

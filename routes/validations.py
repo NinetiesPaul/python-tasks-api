@@ -12,24 +12,32 @@ fieldTypeFormattedName = {
 }
 
 pathsToSanitize = {
-    "^/api/task/update/\d+$": "/api/task/update"
+    "^/api/task/update/\d+$": "/api/task/update",
+    "^/api/task/assign/\d+$": "/api/task/assign",
+    "^/api/task/comment/\d+$": "/api/task/comment"
 }
 
 requiredFields = {
     '/register': [ 'name', 'email', 'password' ] ,
-    '/api/task/create': [ 'title', 'description', 'type' ]
+    '/api/task/create': [ 'title', 'description', 'type' ],
+    '/api/task/assign': [ 'assigned_to' ],
+    '/api/task/comment': [ 'text' ]
 }
 
 fieldByType = {
     '/register': { 'name': 'str', 'email': 'str', 'password': 'str' },
     '/api/task/create': { 'title': 'str', 'description': 'str', 'type': 'str' },
     '/api/task/update': { 'title': 'str', 'description': 'str', 'type': 'str', 'status': 'str' },
+    '/api/task/assign': { 'assigned_to': 'int' },
+    '/api/task/comment': { 'text': 'str' }
 }
 
 fieldNotEmpty = {
     '/register': [ 'name', 'email', 'password' ],
     '/api/task/create': [ 'title', 'description', 'type' ],
-    '/api/task/update': [ 'title', 'description', 'type', 'status' ]
+    '/api/task/update': [ 'title', 'description', 'type', 'status' ],
+    '/api/task/assign': [ 'assigned_to' ],
+    '/api/task/comment': [ 'text' ]
 }
 
 fieldIsIn = {
