@@ -22,6 +22,8 @@ def post_task(current_user):
 
     result = task_schema.dump(task)
     del result['history']
+    del result['assignees']
+    del result['comments']
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
 @app.get("/api/task/list")
