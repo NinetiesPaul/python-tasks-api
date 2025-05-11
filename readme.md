@@ -17,14 +17,14 @@ The main tech behind it is Python's Flask framework, to showcase it's cleanlines
 ## Environment setup
 To run this application you must have installed on your environment:
 
-* `Python` - For the main application 
+* `Python` - For the main application (Ideally >= 3.1)
 * `MySQL` - For storaging and accessing data
 
 ## Installation and Configuration
 Once all required software is up and running, execute the following commands:
 
 ```
-py -3 -m venv venv
+python -m venv venv
 ```
 ```
 source venv/Scripts/activate
@@ -45,7 +45,7 @@ flask shell
 from app import mysql
 ```
 ```
-from models import tasks, users
+from models import *
 ```
 ```
 mysql.create_all()
