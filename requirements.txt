@@ -1,7 +1,8 @@
 Flask
 Flask-SQLAlchemy
-flask-marshmallow
-marshmallow-sqlalchemy
+flask-marshmallow==1.2.0
+marshmallow-sqlalchemy==1.0.0
+marshmallow==3.26.1
 mysqlclient
 python-dotenv
 Werkzeug
