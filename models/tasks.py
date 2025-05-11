@@ -8,7 +8,7 @@ from models.taskAssignee import taskAssignees_schema
 from marshmallow import fields
 
 class Tasks(mysql.Model):
-    id = mysql.Column(mysql.Integer, primary_key=True, auto_increment=True)
+    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
     title = mysql.Column(mysql.String(55), nullable=False)
     description = mysql.Column(mysql.String(255), nullable=False)
     type = mysql.Column(mysql.String(255), nullable=False)

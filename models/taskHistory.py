@@ -5,7 +5,7 @@ from models.users import user_schema
 from marshmallow import fields
 
 class TaskHistory(mysql.Model):
-    id = mysql.Column(mysql.Integer, primary_key=True, auto_increment=True)
+    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
     field = mysql.Column(mysql.String(55), nullable=False)
     changed_from = mysql.Column(mysql.String(255), nullable=False)
     changed_to = mysql.Column(mysql.String(255), nullable=False)

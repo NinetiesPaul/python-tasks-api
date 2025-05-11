@@ -8,7 +8,7 @@ class TaskAssignees(mysql.Model):
     __table_args__ = (
         mysql.UniqueConstraint('assigned_to_id', 'task_id'),
     )
-    id = mysql.Column(mysql.Integer, primary_key=True, auto_increment=True)
+    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
     assigned_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
     assigned_to_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
     task_id = mysql.Column(mysql.Integer, mysql.ForeignKey('tasks.id'), nullable=True)
