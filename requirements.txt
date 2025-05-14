@@ -8,3 +8,7 @@ python-dotenv
 Werkzeug
 PyJWT
 flask-cors
+requests
+coverage
+pytest
+pytest-cov
