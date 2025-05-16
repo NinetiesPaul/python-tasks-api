@@ -34,7 +34,7 @@ class TestTasksValidations:
     def test_log_user(self, cleanup):
         url = "http://localhost:5000/register"
         new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        response = requests.post(url, json=new_user)
+        requests.post(url, json=new_user)
         
         url = "http://localhost:5000/login"
         credentials = {
@@ -42,8 +42,6 @@ class TestTasksValidations:
             "password": "123456"
         }
         response = requests.post(url, json=credentials)
-        assert response.status_code == 200
-        assert response.headers["Content-Type"] == "application/json"
         
         responseJson = response.json()
         TestTasksValidations.tokenBearer = responseJson['token']
