@@ -46,12 +46,12 @@ class TestTasksValidations:
         assert response.headers["Content-Type"] == "application/json"
         
         responseJson = response.json()
-        TestTasksValidation.tokenBearer = responseJson['token']
+        TestTasksValidations.tokenBearer = responseJson['token']
         
     def test_missing_fields(self, ):
         url = "http://localhost:5000/api/task/create"
         new_task = {}
-        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidation.tokenBearer})
+        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidations.tokenBearer})
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
@@ -68,7 +68,7 @@ class TestTasksValidations:
             "description": 99,
             "type": 99
         }
-        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidation.tokenBearer})
+        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidations.tokenBearer})
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
@@ -82,7 +82,7 @@ class TestTasksValidations:
     def test_invalid_empty_fields(self):
         url = "http://localhost:5000/api/task/create"
         new_task = {"title": "", "description": "", "type": ""}
-        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidation.tokenBearer})
+        response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidations.tokenBearer})
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
