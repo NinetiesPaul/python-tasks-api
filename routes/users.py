@@ -14,10 +14,10 @@ from routes import validations
 def register():
     user = Users.query.filter_by(email = request.json['email']).first()
     if user:
-        return make_response(jsonify({ "message": [ "EMAIL_ALREADY_TAKEN" ], "success": False }), 404)
+        return make_response(jsonify({ "message": [ "EMAIL_ALREADY_TAKEN" ], "success": False }), 400)
     
     if not re.search("^(.+)@(\\S+)$", request.json['email']):
-        return make_response(jsonify({ "message": [ "INVALID_EMAIL" ], "success": False }), 404)
+        return make_response(jsonify({ "message": [ "INVALID_EMAIL" ], "success": False }), 400)
 
     password = generate_password_hash(request.json['password'])
 
@@ -33,7 +33,7 @@ def register():
 def login():
     user = Users.query.filter(Users.email == request.json['username']).first()
     if not user:
-        return make_response(jsonify({ "message": [ "USER_NOT_FOUND" ], "success": False }), 404)
+        return make_response(jsonify({ "message": [ "USER_NOT_FOUND" ], "success": False }), 400)
 
     if not check_password_hash(user.password, request.json['password']):
         return make_response(jsonify({ "message": [ "INVALID_CREDENTIALS" ], "success": False }), 400)
