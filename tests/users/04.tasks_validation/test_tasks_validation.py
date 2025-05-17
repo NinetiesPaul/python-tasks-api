@@ -3,39 +3,16 @@ import requests
 import MySQLdb
 from dotenv import dotenv_values
 
+"""
+This test will perform a number of tests to validate the numerous validation
+scenarios for task creation, focusing on requests with bad data integrity
+and values and their output
+"""
 class TestTasksValidations:
     tokenBearer = ""
-    
+
     @pytest.fixture()
-    def cleanup(self):
-        env_var = dotenv_values(".env")
-
-        mydb = MySQLdb.connect(
-            host=env_var['DB_TEST_HOST'],
-            user=env_var['DB_TEST_USER'],
-            password=env_var['DB_TEST_PASSWORD'],
-            database=env_var['DB_TEST_DBNAME']
-        )
-
-        mycursor = mydb.cursor()
-
-        mycursor.execute("""
-            SET FOREIGN_KEY_CHECKS = 0;
-
-            TRUNCATE users;
-            TRUNCATE tasks;
-            TRUNCATE task_assignees;
-            TRUNCATE task_comment;
-            TRUNCATE task_history;
-
-            SET FOREIGN_KEY_CHECKS = 1;
-        """) 
-    
-    def test_log_user(self, cleanup):
-        url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        requests.post(url, json=new_user)
-        
+    def authenticate(self):
         url = "http://localhost:5000/login"
         credentials = {
             "username": "user@test",
@@ -46,7 +23,7 @@ class TestTasksValidations:
         responseJson = response.json()
         TestTasksValidations.tokenBearer = responseJson['token']
         
-    def test_missing_fields(self, ):
+    def test_missing_fields(self, authenticate):
         url = "http://localhost:5000/api/task/create"
         new_task = {}
         response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidations.tokenBearer})

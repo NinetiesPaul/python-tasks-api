@@ -3,6 +3,9 @@ import requests
 import MySQLdb
 from dotenv import dotenv_values
 
+"""
+This test is responsible to register 2 users on the application and to test the GET /users/list request
+"""
 class TestSetUp:
     @pytest.fixture()
     def cleanup(self):
@@ -28,8 +31,6 @@ class TestSetUp:
 
             SET FOREIGN_KEY_CHECKS = 1;
         """)
-        
-        #mydb.commit()
 
     def test_register_user(self, cleanup):
         url = "http://localhost:5000/register"

@@ -3,40 +3,17 @@ import requests
 import MySQLdb
 from dotenv import dotenv_values
 
+"""
+This test will perform a number of tests to validate the numerous validation
+scenarios for task udpate, focusing on requests with bad data integrity
+and values and their output
+"""
 class TestTasksValidationsOnUpdate:
     tokenBearer = ""
     taskId = 1
     
     @pytest.fixture()
-    def cleanup(self):
-        env_var = dotenv_values(".env")
-
-        mydb = MySQLdb.connect(
-            host=env_var['DB_TEST_HOST'],
-            user=env_var['DB_TEST_USER'],
-            password=env_var['DB_TEST_PASSWORD'],
-            database=env_var['DB_TEST_DBNAME']
-        )
-
-        mycursor = mydb.cursor()
-
-        mycursor.execute("""
-            SET FOREIGN_KEY_CHECKS = 0;
-
-            TRUNCATE users;
-            TRUNCATE tasks;
-            TRUNCATE task_assignees;
-            TRUNCATE task_comment;
-            TRUNCATE task_history;
-
-            SET FOREIGN_KEY_CHECKS = 1;
-        """) 
-    
-    def test_log_user_and_create_task(self, cleanup):
-        url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        requests.post(url, json=new_user)
-        
+    def authenticate(self):
         url = "http://localhost:5000/login"
         credentials = {
             "username": "user@test",
@@ -49,14 +26,14 @@ class TestTasksValidationsOnUpdate:
         url = "http://localhost:5000/api/task/create"
         new_task = {
             "title": "Task title",
-            "description": "This is the task description",
+            "description": "This is the task for task validations on update tests",
             "type": "feature"
         }
         response = requests.post(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidationsOnUpdate.tokenBearer})
         responseJson = response.json()["data"]
         TestTasksValidationsOnUpdate.taskId = responseJson['id']
 
-    def test_empty_fields(self):
+    def test_empty_fields(self, authenticate):
         url = "http://localhost:5000/api/task/update/" + str(TestTasksValidationsOnUpdate.taskId)
         new_task = {
             "title": "",
@@ -95,12 +72,22 @@ class TestTasksValidationsOnUpdate:
         assert "TYPE_NOT_STRING" in responseJson
         assert "INVALID_TYPE" in responseJson
 
-    def test_invalid_fieds(self):
+    def test_task_not_found_no_update(self):
         url = "http://localhost:5000/api/task/update/999"
         new_task = {
             "title": "new title for error test"
         }
         response = requests.put(url, json=new_task, headers={"Authorization": "Bearer " + TestTasksValidationsOnUpdate.tokenBearer})
+        assert response.status_code == 404
+        assert response.headers["Content-Type"] == "application/json"
+
+        responseJson = response.json()["message"]
+        assert isinstance(responseJson, list)
+        assert "TASK_NOT_FOUND" in responseJson
+
+    def test_task_not_found_on_close(self):
+        url = "http://localhost:5000/api/task/close/999"
+        response = requests.put(url, headers={"Authorization": "Bearer " + TestTasksValidationsOnUpdate.tokenBearer})
         assert response.status_code == 404
         assert response.headers["Content-Type"] == "application/json"
 

@@ -94,7 +94,7 @@ def put_task(current_user, id):
         return make_response(jsonify({ "message": [ "TASK_NOT_FOUND" ], "success": False }), 404)
 
     if task.status == 'closed':
-        return make_response(jsonify({ "message": [ "TASK_CLOSED" ], "success": False }), 404)
+        return make_response(jsonify({ "message": [ "TASK_CLOSED" ], "success": False }), 400)
     
     if 'status' in data and data['status'] == 'closed':
         return make_response(jsonify({ "message": [ "CAN_NOT_UPDATE_TO_CLOSE" ], "success": False }), 400)
@@ -137,7 +137,7 @@ def close_task(current_user, id):
         return make_response(jsonify({ "message": [ "TASK_NOT_FOUND" ], "success": False }), 404)
     
     if task.status == 'closed':
-        return make_response(jsonify({ "message": [ "TASK_ALREADY_CLOSED" ], "success": False }), 404)
+        return make_response(jsonify({ "message": [ "TASK_ALREADY_CLOSED" ], "success": False }), 400)
     
     taskHistory = TaskHistory('status', task.status, 'closed', current_user, task)
     mysql.session.add(taskHistory)

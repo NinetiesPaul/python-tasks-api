@@ -3,6 +3,11 @@ import requests
 import MySQLdb
 from dotenv import dotenv_values
 
+"""
+This test will perform a number of tests to validate the numerous validation
+scenarios for user registration, focusing on requests with bad data integrity
+and values and their output
+"""
 class TestUserValidations:
     @pytest.fixture()
     def cleanup(self):

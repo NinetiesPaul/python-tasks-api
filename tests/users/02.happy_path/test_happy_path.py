@@ -1,5 +1,10 @@
 import requests
 
+"""
+This test will perform a rundown of the entire task life cycle: create,
+update, assignment and unassignment, comment creation and exclusion, and
+task closing, while veryfing response's integrity, status and values 
+"""
 class TestHappyPath:
     tokenBearer = ""
     taskId = 1
