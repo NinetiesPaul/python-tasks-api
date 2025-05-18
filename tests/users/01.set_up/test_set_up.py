@@ -1,7 +1,8 @@
 import pytest
 import requests
-import MySQLdb
 from dotenv import dotenv_values
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 
 """
 This test is responsible to register 2 users on the application and to test the GET /users/list request
@@ -11,26 +12,13 @@ class TestSetUp:
     def cleanup(self):
         env_var = dotenv_values(".env")
 
-        mydb = MySQLdb.connect(
-            host=env_var['DB_TEST_HOST'],
-            user=env_var['DB_TEST_USER'],
-            password=env_var['DB_TEST_PASSWORD'],
-            database=env_var['DB_TEST_DBNAME']
-        )
-
-        mycursor = mydb.cursor()
-
-        mycursor.execute("""
-            SET FOREIGN_KEY_CHECKS = 0;
-
-            TRUNCATE users;
-            TRUNCATE tasks;
-            TRUNCATE task_assignees;
-            TRUNCATE task_comment;
-            TRUNCATE task_history;
-
-            SET FOREIGN_KEY_CHECKS = 1;
-        """)
+        engine = create_engine(env_var['DB_URL_TESTING'])
+        with engine.begin() as connection:
+            connection.execute(text('DELETE FROM task_history;'))
+            connection.execute(text('DELETE FROM task_comment;'))
+            connection.execute(text('DELETE FROM task_assignees;'))
+            connection.execute(text('DELETE FROM tasks;'))
+            connection.execute(text('DELETE FROM users;'))
 
     def test_register_user(self, cleanup):
         url = "http://localhost:5000/register"

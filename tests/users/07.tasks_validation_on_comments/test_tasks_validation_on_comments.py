@@ -1,6 +1,5 @@
 import pytest
 import requests
-import MySQLdb
 from dotenv import dotenv_values
 
 """
