@@ -14,7 +14,7 @@ else:
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_uri
 CORS(app)
-mysql = SQLAlchemy(app)
+database = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 from routes.users import *

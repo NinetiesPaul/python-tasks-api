@@ -1,26 +1,26 @@
 import json
 import datetime
-from app import mysql, ma
+from app import database, ma
 from models.users import user_schema
 from models.taskHistory import taskHistory_schema
 from models.taskComment import taskComment_schema
 from models.taskAssignee import taskAssignees_schema
 from marshmallow import fields
 
-class Tasks(mysql.Model):
-    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
-    title = mysql.Column(mysql.String(55), nullable=False)
-    description = mysql.Column(mysql.String(255), nullable=False)
-    type = mysql.Column(mysql.String(255), nullable=False)
-    status = mysql.Column(mysql.String(255), nullable=False)
-    created_on = mysql.Column(mysql.DateTime, nullable=False)
-    created_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
-    closed_on = mysql.Column(mysql.DateTime, nullable=True)
-    closed_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=True)
+class Tasks(database.Model):
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    title = database.Column(database.String(55), nullable=False)
+    description = database.Column(database.String(255), nullable=False)
+    type = database.Column(database.String(255), nullable=False)
+    status = database.Column(database.String(255), nullable=False)
+    created_on = database.Column(database.DateTime, nullable=False)
+    created_by_id = database.Column(database.Integer, database.ForeignKey('users.id'), nullable=False)
+    closed_on = database.Column(database.DateTime, nullable=True)
+    closed_by_id = database.Column(database.Integer, database.ForeignKey('users.id'), nullable=True)
 
-    comments = mysql.relationship('TaskComment', backref='task', lazy='select', foreign_keys="TaskComment.task_id")
-    history = mysql.relationship('TaskHistory', backref='task', lazy='select', foreign_keys="TaskHistory.task_id")
-    assignees = mysql.relationship('TaskAssignees', backref='task', lazy='select', foreign_keys="TaskAssignees.task_id")
+    comments = database.relationship('TaskComment', backref='task', lazy='select', foreign_keys="TaskComment.task_id")
+    history = database.relationship('TaskHistory', backref='task', lazy='select', foreign_keys="TaskHistory.task_id")
+    assignees = database.relationship('TaskAssignees', backref='task', lazy='select', foreign_keys="TaskAssignees.task_id")
 
     def __init__(self, title, description, type, created_by, created_on = datetime.datetime.now(), closed_on = None, closed_by = None, status = "open"):
         self.title = title

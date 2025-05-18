@@ -2,7 +2,7 @@ import datetime
 from flask import make_response, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import app, mysql
+from app import app, database
 from routes import validations
 from models.taskHistory import TaskHistory
 from models.taskAssignee import TaskAssignees, taskAssignee_schema
@@ -17,8 +17,8 @@ def post_task(current_user):
     data = request.get_json()
 
     task = Tasks(data['title'], data['description'], data['type'], current_user)
-    mysql.session.add(task)
-    mysql.session.commit()
+    database.session.add(task)
+    database.session.commit()
 
     result = task_schema.dump(task)
     del result['history']
@@ -117,12 +117,12 @@ def put_task(current_user, id):
         historyEntries['status'] = [ task.status, data['status'] ]
         task.status = data['status']
 
-    mysql.session.commit()
+    database.session.commit()
 
     for entry in historyEntries:
         taskHistory = TaskHistory(entry, historyEntries[entry][0], historyEntries[entry][1], current_user, task)
-        mysql.session.add(taskHistory)
-        mysql.session.commit()
+        database.session.add(taskHistory)
+        database.session.commit()
 
     result = task_schema.dump(task)
     del result['history']
@@ -140,14 +140,14 @@ def close_task(current_user, id):
         return make_response(jsonify({ "message": [ "TASK_ALREADY_CLOSED" ], "success": False }), 400)
     
     taskHistory = TaskHistory('status', task.status, 'closed', current_user, task)
-    mysql.session.add(taskHistory)
-    mysql.session.commit()
+    database.session.add(taskHistory)
+    database.session.commit()
 
     task.status = 'closed'
     task.closed_on = datetime.datetime.now()
     task.closed_by = current_user
 
-    mysql.session.commit()
+    database.session.commit()
     result = task_schema.dump(task)
     del result['history']
     return make_response(jsonify({ "data": result, "success": True }), 200)
@@ -168,17 +168,17 @@ def assign_task(current_user, taskId):
 
     try:
         taskAssignee = TaskAssignees(current_user, assignedTo, task)
-        mysql.session.add(taskAssignee)
-        mysql.session.commit()
+        database.session.add(taskAssignee)
+        database.session.commit()
     except Exception as e:
-        if type(e) == mysql.exc.IntegrityError:
+        if type(e) == database.exc.IntegrityError:
             return make_response(jsonify({ "message": [ "USER_ALREADY_ASSIGNED" ], "success": False }), 202)
     
     taskHistory = TaskHistory("added_assignee", "", assignedTo.name, current_user, task)
-    mysql.session.add(taskHistory)
-    mysql.session.commit()
+    database.session.add(taskHistory)
+    database.session.commit()
 
-    mysql.session.commit()
+    database.session.commit()
     result = taskAssignee_schema.dump(taskAssignee)
     return make_response(jsonify({ "data": result, "success": True }), 200)
 
@@ -190,15 +190,15 @@ def unassign_task(current_user, assignmentId):
     if not assignment:
         return make_response(jsonify({ "message": [ "ASSIGNMENT_NOT_FOUND" ], "success": False }), 404)
     
-    mysql.session.delete(assignment)
-    mysql.session.commit()
+    database.session.delete(assignment)
+    database.session.commit()
 
     assignedTo = Users.query.get(assignment.assigned_to_id)
     task = Tasks.query.get(assignment.task_id)
 
     taskHistory = TaskHistory("removed_assignee", "", assignedTo.name, current_user, task)
-    mysql.session.add(taskHistory)
-    mysql.session.commit()
+    database.session.add(taskHistory)
+    database.session.commit()
 
     return make_response(jsonify({ "data": None, "success": True }), 200)
 
@@ -213,8 +213,8 @@ def add_comment(current_user, commentId):
         return make_response(jsonify({ "message": [ "TASK_NOT_FOUND" ], "success": False }), 404)
 
     taskComment = TaskComment(requestData['text'], current_user, task)
-    mysql.session.add(taskComment)
-    mysql.session.commit()
+    database.session.add(taskComment)
+    database.session.commit()
 
     result = taskComment_schema.dump(taskComment)
     return make_response(jsonify({ "data": result, "success": True }), 200)
@@ -227,8 +227,8 @@ def delete_comment(current_user, commentId):
     if not comment:
         return make_response(jsonify({ "message": [ "COMMENT_NOT_FOUND" ], "success": False }), 404)
     
-    mysql.session.delete(comment)
-    mysql.session.commit()
+    database.session.delete(comment)
+    database.session.commit()
 
     return make_response(jsonify({ "data": None, "success": True }), 200)
 
@@ -240,6 +240,6 @@ def delete_task(current_user, id):
     if not task:
         return make_response(jsonify({ "msg": "TASK_NOT_FOUND", "success": False }), 404)
     
-    mysql.session.delete(task)
-    mysql.session.commit()
+    database.session.delete(task)
+    database.session.commit()
     return make_response(jsonify({ "msg": "Task id '" + id + "' was deleted", "success": True }), 200)
