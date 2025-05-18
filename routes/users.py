@@ -5,7 +5,7 @@ from flask import make_response, request, jsonify
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import app, mysql, env_var
+from app import app, database, env_var
 from models.users import Users, user_schema, users_schema
 from routes import validations
 
@@ -22,8 +22,8 @@ def register():
     password = generate_password_hash(request.json['password'])
 
     user = Users(request.json['name'], request.json['email'], password)
-    mysql.session.add(user)
-    mysql.session.commit()
+    database.session.add(user)
+    database.session.commit()
 
     result = user_schema.dump(user)
     return make_response(jsonify({ "data": result, "success": True }), 200)

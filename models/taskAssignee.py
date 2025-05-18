@@ -1,17 +1,17 @@
 import json
 import datetime
-from app import mysql, ma
+from app import database, ma
 from models.users import user_schema
 from marshmallow import fields
 
-class TaskAssignees(mysql.Model):
+class TaskAssignees(database.Model):
     __table_args__ = (
-        mysql.UniqueConstraint('assigned_to_id', 'task_id'),
+        database.UniqueConstraint('assigned_to_id', 'task_id'),
     )
-    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
-    assigned_by_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
-    assigned_to_id = mysql.Column(mysql.Integer, mysql.ForeignKey('users.id'), nullable=False)
-    task_id = mysql.Column(mysql.Integer, mysql.ForeignKey('tasks.id'), nullable=True)
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    assigned_by_id = database.Column(database.Integer, database.ForeignKey('users.id'), nullable=False)
+    assigned_to_id = database.Column(database.Integer, database.ForeignKey('users.id'), nullable=False)
+    task_id = database.Column(database.Integer, database.ForeignKey('tasks.id'), nullable=True)
 
     def __init__(self, assigned_by, assigned_to, task):
         self.assigned_by = assigned_by

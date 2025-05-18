@@ -12,13 +12,13 @@ My main goal is to showcase some concepts, such as:
 - Routes definitions
 - SOLID and KISS principles on a MVC architecture
 
-The main tech behind it is Python's Flask framework, to showcase it's cleanliness and simplicity while maintaning a robust architecture. I'm also using some others libraries. For storaging, i'm using MySQL relational database
+The main tech behind it is Python's Flask framework, to showcase it's cleanliness and simplicity while maintaning a robust architecture. I'm also using some others libraries. For storaging, i'm using relational databases
 
 ## Environment setup
 To run this application you must have installed on your environment:
 
 * `Python` - For the main application (Ideally >= 3.1)
-* `MySQL` - For storaging and accessing data
+* `MySQL` or `PostgreSQL` - For storaging and accessing data
 
 ## Installation and Configuration
 Once all required software is up and running, execute the following commands:
@@ -42,13 +42,13 @@ then go back to the prompt and run the following:
 flask shell
 ```
 ```
-from app import mysql
+from app import database
 ```
 ```
 from models import *
 ```
 ```
-mysql.create_all()
+database.create_all()
 ```
 ```
 exit()

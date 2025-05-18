@@ -1,18 +1,18 @@
 import json
-from app import mysql, ma
+from app import database, ma
 
-class Users(mysql.Model):
-    id = mysql.Column(mysql.Integer, primary_key=True, autoincrement=True)
-    name = mysql.Column(mysql.String(255), nullable=False)
-    email = mysql.Column(mysql.String(255), unique=True, nullable=False)
-    password = mysql.Column(mysql.String(255), nullable=False)
+class Users(database.Model):
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    name = database.Column(database.String(255), nullable=False)
+    email = database.Column(database.String(255), unique=True, nullable=False)
+    password = database.Column(database.String(255), nullable=False)
 
-    createdBy = mysql.relationship('Tasks', backref='created_by', lazy='select', foreign_keys="Tasks.created_by_id")
-    closedBy = mysql.relationship('Tasks', backref='closed_by', lazy='select', foreign_keys="Tasks.closed_by_id")
-    changedBy = mysql.relationship('TaskHistory', backref='changed_by', lazy='select', foreign_keys="TaskHistory.changed_by_id")
-    assignedTo = mysql.relationship('TaskAssignees', backref='assigned_to', lazy='select', foreign_keys="TaskAssignees.assigned_to_id")
-    assignedBy = mysql.relationship('TaskAssignees', backref='assigned_by', lazy='select', foreign_keys="TaskAssignees.assigned_by_id")
-    commentCreatedBy = mysql.relationship('TaskComment', backref='created_by', lazy='select', foreign_keys="TaskComment.created_by_id")
+    createdBy = database.relationship('Tasks', backref='created_by', lazy='select', foreign_keys="Tasks.created_by_id")
+    closedBy = database.relationship('Tasks', backref='closed_by', lazy='select', foreign_keys="Tasks.closed_by_id")
+    changedBy = database.relationship('TaskHistory', backref='changed_by', lazy='select', foreign_keys="TaskHistory.changed_by_id")
+    assignedTo = database.relationship('TaskAssignees', backref='assigned_to', lazy='select', foreign_keys="TaskAssignees.assigned_to_id")
+    assignedBy = database.relationship('TaskAssignees', backref='assigned_by', lazy='select', foreign_keys="TaskAssignees.assigned_by_id")
+    commentCreatedBy = database.relationship('TaskComment', backref='created_by', lazy='select', foreign_keys="TaskComment.created_by_id")
 
     def __init__(self, name, email, password):
         self.name = name
