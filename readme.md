@@ -42,13 +42,13 @@ then go back to the prompt and run the following:
 flask shell
 ```
 ```
-from app import mysql
+from app import database
 ```
 ```
 from models import *
 ```
 ```
-mysql.create_all()
+database.create_all()
 ```
 ```
 exit()
