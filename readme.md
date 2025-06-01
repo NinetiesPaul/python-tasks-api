@@ -59,7 +59,11 @@ flask run
 And you're ready to use the API!
 
 ## Tests
-Before running the integration tests to validate the application's features, you must migrate the databases dedicated to tests. This depends on your `.env` configuration, if the ENVIRONMENT value isn't set the app will assume you're running in dev/prod enviroment. But if you need to run tests, set the `ENVIRONMENT` to `testing` and configure `DB_URL_TESTING` accordingly.
+Before running the integration tests to validate the application's features, you must migrate the databases dedicated to tests. This depends on your `.env` configuration, if the ENVIRONMENT value isn't set the app will assume you're running in dev/prod enviroment. But if you need to run tests, set the `ENVIRONMENT` to `testing` and configure `DB_URL_TESTING` accordingly. To run the tests, simply use:
+```
+pytest
+```
+
 
 ## Usage
 ### __Users__
