@@ -4,9 +4,17 @@ from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
+from app.app import app
 """
 This test is responsible to register 2 users on the application and to test the GET /users/list request
 """
+
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
 class TestSetUp:
     @pytest.fixture()
     def cleanup(self):
@@ -20,38 +28,38 @@ class TestSetUp:
             connection.execute(text('DELETE FROM tasks;'))
             connection.execute(text('DELETE FROM users;'))
 
-    def test_register_user(self, cleanup):
+    def test_register_user(self, cleanup, client):
         url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        response = requests.post(url, json=new_user)
+        new_user = {"name": "Test User One", "email": "user@test", "password": "123456"}
+        response = client.post(url, json=new_user)
         assert response.status_code == 200
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["data"]
+        responseJson = response.get_json()["data"]
         assert isinstance(responseJson, object)
         assert isinstance(responseJson['id'], int)
-        assert responseJson['name'] == "Pytest"
+        assert responseJson['name'] == "Test User One"
         assert responseJson['email'] == "user@test"
         
         url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest Second", "email": "userPytest@test", "password": "123456"}
-        response = requests.post(url, json=new_user)
+        new_user = {"name": "Test User Two", "email": "usertwo@test", "password": "123456"}
+        response = client.post(url, json=new_user)
         assert response.status_code == 200
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["data"]
+        responseJson = response.get_json()["data"]
         assert isinstance(responseJson, object)
         assert isinstance(responseJson['id'], int)
-        assert responseJson['name'] == "Pytest Second"
-        assert responseJson['email'] == "userPytest@test"
+        assert responseJson['name'] == "Test User Two"
+        assert responseJson['email'] == "usertwo@test"
     
-    def test_list_all_users(self):
+    def test_list_all_users(self, client):
         url = "http://localhost:5000/api/users/list"
-        response = requests.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["data"]
+        responseJson = response.get_json()["data"]
         users = responseJson["users"]
         total = responseJson["total"]
         assert isinstance(total, int)
