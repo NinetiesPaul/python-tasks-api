@@ -18,7 +18,7 @@ The main tech behind it is Python's Flask framework, to showcase it's cleanlines
 To run this application you must have installed on your environment:
 
 * `Python` - For the main application (Ideally >= 3.1)
-* `MySQL` or `PostgreSQL` - For storaging and accessing data
+* `MySQL` (5.7 or greater) or `PostgreSQL` (15 or greater) - For storaging and accessing data
 
 ## Installation and Configuration
 Once all required software is up and running, execute the following commands:
@@ -36,8 +36,9 @@ If no error is thrown, the basic environment is installed. Now you must generate
 ```
 cp .env.example .env
 ```
-Open the newly created .env file and on the ```DB_URL``` parameter replace the keywords on the {}'s for your database connection information. Having done that, just save the file
-then go back to the prompt and run the following:
+Open the newly created .env file and on the ```DB_URL``` parameter replace the keywords on the {}'s for your database connection information.
+
+Having done that, just save the file then go back to the prompt and run the following:
 ```
 flask shell
 ```
@@ -58,6 +59,9 @@ If there's no big red error messages screaming at you, then you are good to go. 
 flask run
 ```
 And you're ready to use the API!
+
+## Tests
+Before running the integration tests to validate the application's features, you must migrate the databases dedicated to tests. This depends on your `.env` configuration, if the ENVIRONMENT value isn't set the app will assume you're running in dev/prod enviroment. But if you need to run tests, set the `ENVIRONMENT` to `testing` and configure `DB_URL_TESTING` accordingly.
 
 ## Usage
 ### __Users__
