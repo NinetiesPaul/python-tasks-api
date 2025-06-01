@@ -1,10 +1,10 @@
 import json
 import datetime
-from app import database, ma
-from models.users import user_schema
-from models.taskHistory import taskHistory_schema
-from models.taskComment import taskComment_schema
-from models.taskAssignee import taskAssignees_schema
+from app.app import database, ma
+from app.models.users import user_schema
+from app.models.taskHistory import taskHistory_schema
+from app.models.taskComment import taskComment_schema
+from app.models.taskAssignee import taskAssignees_schema
 from marshmallow import fields
 
 class Tasks(database.Model):

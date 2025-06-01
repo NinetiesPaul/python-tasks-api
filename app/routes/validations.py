@@ -3,8 +3,8 @@ from functools import wraps
 from flask import request, jsonify
 import re
 
-from app import env_var
-from models.users import Users
+from app.app import env_var
+from app.models.users import Users
 
 fieldTypeFormattedName = {
     'str': 'STRING',

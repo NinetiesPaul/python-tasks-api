@@ -5,9 +5,9 @@ from flask import make_response, request, jsonify
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import app, database, env_var
-from models.users import Users, user_schema, users_schema
-from routes import validations
+from app.app import app, database, env_var
+from app.models.users import Users, user_schema, users_schema
+from app.routes import validations
 
 @app.post("/register")
 @validations.validator

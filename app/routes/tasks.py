@@ -2,13 +2,13 @@ import datetime
 from flask import make_response, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import app, database
-from routes import validations
-from models.taskHistory import TaskHistory
-from models.taskAssignee import TaskAssignees, taskAssignee_schema
-from models.taskComment import TaskComment, taskComment_schema
-from models.tasks import Tasks, task_schema, tasks_schema
-from models.users import Users, user_schema, users_schema
+from app.app import app, database
+from app.routes import validations
+from app.models.taskHistory import TaskHistory
+from app.models.taskAssignee import TaskAssignees, taskAssignee_schema
+from app.models.taskComment import TaskComment, taskComment_schema
+from app.models.tasks import Tasks, task_schema, tasks_schema
+from app.models.users import Users, user_schema, users_schema
 
 @app.post("/api/task/create")
 @validations.token_required
@@ -232,6 +232,8 @@ def delete_comment(current_user, commentId):
 
     return make_response(jsonify({ "data": None, "success": True }), 200)
 
+
+"""
 @app.delete("/api/task/delete/<id>")
 @validations.token_required
 def delete_task(current_user, id):
@@ -243,3 +245,4 @@ def delete_task(current_user, id):
     database.session.delete(task)
     database.session.commit()
     return make_response(jsonify({ "msg": "Task id '" + id + "' was deleted", "success": True }), 200)
+"""
