@@ -1,5 +1,5 @@
 import json
-from app import database, ma
+from app.app import database, ma
 
 class Users(database.Model):
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)

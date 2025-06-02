@@ -4,11 +4,20 @@ from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
+from app.app import app
 """
 This test will perform a number of tests to validate the numerous validation
 scenarios for user registration, focusing on requests with bad data integrity
 and values and their output
 """
+
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+
 class TestUserValidations:
     @pytest.fixture()
     def cleanup(self):
@@ -22,68 +31,68 @@ class TestUserValidations:
             connection.execute(text('DELETE FROM tasks;'))
             connection.execute(text('DELETE FROM users;'))
 
-    def test_missing_fields(self, cleanup):
+    def test_missing_fields(self, cleanup, client):
         url = "http://localhost:5000/register"
         new_user = {"namee": "", "emaill": "", "passwordd": ""}
-        response = requests.post(url, json=new_user)
+        response = client.post(url, json=new_user)
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["message"]
+        responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "MISSING_NAME" in responseJson
         assert "MISSING_EMAIL" in responseJson
         assert "MISSING_PASSWORD" in responseJson
         
-    def test_invalid_type_fields(self):
+    def test_invalid_type_fields(self, client):
         url = "http://localhost:5000/register"
         new_user = {"name": 99, "email": 99, "password": "password"}
-        response = requests.post(url, json=new_user)
+        response = client.post(url, json=new_user)
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["message"]
+        responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "NAME_NOT_STRING" in responseJson
         assert "EMAIL_NOT_STRING" in responseJson
         
-    def test_invalid_empty_fields(self):
+    def test_invalid_empty_fields(self, client):
         url = "http://localhost:5000/register"
         new_user = {"name": "", "email": "", "password": ""}
-        response = requests.post(url, json=new_user)
+        response = client.post(url, json=new_user)
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["message"]
+        responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "EMPTY_NAME" in responseJson
         assert "EMPTY_EMAIL" in responseJson
         assert "EMPTY_PASSWORD" in responseJson
         
-    def test_invalid_email(self):
+    def test_invalid_email(self, client):
         url = "http://localhost:5000/register"
         new_user = {"name": "John Doe", "email": "j.doemail.com", "password": "password"}
-        response = requests.post(url, json=new_user)
+        response = client.post(url, json=new_user)
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["message"]
+        responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "INVALID_EMAIL" in responseJson
         
-    def test_email_taken(self):
+    def test_email_taken(self, client):
         url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        response = requests.post(url, json=new_user)
+        new_user = {"name": "New User", "email": "user@test", "password": "123456"}
+        response = client.post(url, json=new_user)
         assert response.status_code == 200
         assert response.headers["Content-Type"] == "application/json"
         
         url = "http://localhost:5000/register"
-        new_user = {"name": "Pytest", "email": "user@test", "password": "123456"}
-        response = requests.post(url, json=new_user)
+        new_user = {"name": "New User", "email": "user@test", "password": "123456"}
+        response = client.post(url, json=new_user)
         assert response.status_code == 400
         assert response.headers["Content-Type"] == "application/json"
         
-        responseJson = response.json()["message"]
+        responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "EMAIL_ALREADY_TAKEN" in responseJson

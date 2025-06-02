@@ -1,7 +1,7 @@
 import json
 import datetime
-from app import database, ma
-from models.users import user_schema
+from app.app import database, ma
+from app.models.users import user_schema
 from marshmallow import fields
 
 class TaskComment(database.Model):

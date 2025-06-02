@@ -41,10 +41,10 @@ Having done that, just save the file then go back to the prompt and run the foll
 flask shell
 ```
 ```
-from app import database
+from app.app import database
 ```
 ```
-from models import *
+from app.models import *
 ```
 ```
 database.create_all()
@@ -61,9 +61,14 @@ And you're ready to use the API!
 ## Tests
 Before running the integration tests to validate the application's features, you must migrate the databases dedicated to tests. This depends on your `.env` configuration, if the ENVIRONMENT value isn't set the app will assume you're running in dev/prod enviroment. But if you need to run tests, set the `ENVIRONMENT` to `testing` and configure `DB_URL_TESTING` accordingly. To run the tests, simply use:
 ```
-pytest
+PYTHONPATH=. pytest
 ```
 
+If you wish to see the code coverage to see how much the code is being tested, run the command as:
+```
+PYTHONPATH=. pytest --cov=app --cov-report html:htmlcov tests/
+```
+The file `index.html` under the created htmlcov folder can be opened to see the total code coverage. 
 
 ## Usage
 ### __Users__
