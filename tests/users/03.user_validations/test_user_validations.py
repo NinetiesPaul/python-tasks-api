@@ -96,3 +96,29 @@ class TestUserValidations:
         responseJson = response.get_json()["message"]
         assert isinstance(responseJson, list)
         assert "EMAIL_ALREADY_TAKEN" in responseJson
+        
+    def test_user_not_found_on_login(self, client):
+        url = "http://localhost:5000/login"
+        response = client.post(url, json={
+            "username": "someone@someone.com",
+            "password": "123456"
+        })
+        assert response.status_code == 404
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "USER_NOT_FOUND" in responseJson
+        
+    def test_invalid_credentials_on_login(self, client):
+        url = "http://localhost:5000/login"
+        response = client.post(url, json={
+            "username": "user@test",
+            "password": "1234567"
+        })
+        assert response.status_code == 400
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "INVALID_CREDENTIALS" in responseJson

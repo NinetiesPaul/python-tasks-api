@@ -18,7 +18,7 @@ class TestHappyPath:
     token = ""
     secondToken = ""
     taskId = 1
-    userId = 1
+    user = None
     assignmentId = 1
     commentId = 1
         
@@ -253,3 +253,41 @@ class TestHappyPath:
         assert isinstance(responseJson, object)
         assert responseJson['created_by']['name'] == "Test User One"
         assert responseJson['closed_by']['name'] == "Test User Two"
+
+    def test_list_tasks_filter_validation(self, client):      
+        url = "http://localhost:5000/api/task/list?type=type&status=status&created_by=999999"
+        response = client.get(url, headers={"Authorization": "Bearer " + TestHappyPath.secondToken})
+        assert response.status_code == 400
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "INVALID_TYPE" in responseJson
+        assert "INVALID_STATUS" in responseJson
+        assert "USER_NOT_FOUND" in responseJson
+
+    def test_list_tasks_filter_by_created_by(self, client):      
+        url = "http://localhost:5000/api/task/list?created_by=" + str(TestHappyPath.user['id'])
+        response = client.get(url, headers={"Authorization": "Bearer " + TestHappyPath.secondToken})
+        assert response.status_code == 200
+        assert response.headers["Content-Type"] == "application/json"
+
+    def test_protected_url_requires_token(self, client):      
+        url = "http://localhost:5000/api/task/list"
+        response = client.get(url)
+        assert response.status_code == 401
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "MISSING_TOKEN" in responseJson
+
+    def test_protected_url_refuses_invalid_token(self, client):      
+        url = "http://localhost:5000/api/task/list"
+        response = client.get(url, headers={"Authorization": "Bearer some token"})
+        assert response.status_code == 401
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "INVALID_TOKEN" in responseJson

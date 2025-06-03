@@ -74,3 +74,13 @@ class TestTasksValidations:
         assert "EMPTY_TITLE" in responseJson
         assert "EMPTY_DESCRIPTION" in responseJson
         assert "EMPTY_TYPE" in responseJson
+        
+    def test_invalid_empty_fields(self, client):
+        url = "http://localhost:5000/api/task/view/999999"
+        response = client.get(url, headers={"Authorization": "Bearer " + TestTasksValidations.tokenBearer})
+        assert response.status_code == 404
+        assert response.headers["Content-Type"] == "application/json"
+        
+        responseJson = response.get_json()["message"]
+        assert isinstance(responseJson, list)
+        assert "TASK_NOT_FOUND" in responseJson

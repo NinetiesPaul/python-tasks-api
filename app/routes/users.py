@@ -33,7 +33,7 @@ def register():
 def login():
     user = Users.query.filter(Users.email == request.json['username']).first()
     if not user:
-        return make_response(jsonify({ "message": [ "USER_NOT_FOUND" ], "success": False }), 400)
+        return make_response(jsonify({ "message": [ "USER_NOT_FOUND" ], "success": False }), 404)
 
     if not check_password_hash(user.password, request.json['password']):
         return make_response(jsonify({ "message": [ "INVALID_CREDENTIALS" ], "success": False }), 400)
